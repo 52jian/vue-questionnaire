@@ -1,36 +1,24 @@
 <template>
-  <div>
-    <el-form-item
-      label="题目"
-      :prop="'topic.' + index + '.question'"
-      :rules="{
-        required: true, message: '题目内容不能为空', trigger: 'blur'
-      }"
-    >
-      <el-input v-model="topic.question" placeholder="请输入题目内容" />
+  <div class="single-choice">
+    <el-form-item label="题目：" required props="qcontent">
+      <el-input v-model="listData.qcontent" placeholder="请输入题目内容" />
     </el-form-item>
-    <el-form-item label="题目说明">
-      <el-input v-model="topic.description" placeholder="请输入题目说明，可以为空" />
+    <el-form-item label="题目说明：">
+      <el-input
+        v-model="listData.qdescription"
+        placeholder="请输入题目说明，可以为空"
+      />
     </el-form-item>
-    <el-form-item label="">
+    <el-form-item label="选项：">
       <div
-        v-for="(option, opIndex) in topic.options"
+        v-for="(option, opIndex) in listData.optionsList"
         :key="opIndex"
         class="option-item"
       >
         <el-row :gutter="22">
           <el-col :span="18">
-            <el-form-item
-              :label="`选项 ${ opIndex + 1 }`"
-              :prop="'topic.' + index + '.options.' + opIndex + '.content'"
-              :rules="{
-                required: true, message: '选项内容不能为空', trigger: 'blur'
-              }"
-            >
-              <el-input
-                v-model="option.content"
-                placeholder="请输入选项内容"
-              />
+            <el-form-item :label="`选项 ${opIndex + 1}`" required>
+              <el-input v-model="option.ovalue" placeholder="请输入选项内容" />
             </el-form-item>
           </el-col>
           <el-col :span="4">
@@ -38,7 +26,7 @@
               type="success"
               icon="el-icon-plus"
               size="mini"
-              @click="addOption(index)"
+              @click="addOption(opIndex)"
             />
             <el-button
               type="warning"
@@ -52,51 +40,20 @@
           <el-col :span="18">
             <el-form-item label="描述">
               <el-input
-                v-model="option.desc"
+                v-model="option.odesc"
                 type="textarea"
-                :autosize="{ minRows: 2,maxRows: 5 }"
+                :autosize="{ minRows: 2, maxRows: 5 }"
                 placeholder="请输入选项描述"
               />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row style="margin-bottom: 5px">
-          <el-col :span="18">
-            <el-form-item label="图片">
-              <el-input
-                v-model="option.image"
-                placeholder="请输入图片地址"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <div class="option-addtion">
-          <el-form-item
-            label="附加内容："
-            :prop="'topic.' + index + '.options.' + opIndex + '.isAddition'"
-            :rules="{
-              required: true, message: '选项内容不能为空', trigger: 'blur'
-            }"
-          >
-            <el-switch
-              v-model="option.isAddition"
-              active-text="有"
-              inactive-text="无"
-            />
-          </el-form-item>
-        </div>
       </div>
     </el-form-item>
-    <el-form-item
-      label="必填项"
-      :prop="'topic.' + index + '.isRequired'"
-      :rules="{
-        type: 'boolean', required: true, message: '请选择是否为必填项', trigger: 'change'
-      }"
-    >
+    <el-form-item label="必填项">
       <div class="option-addtion">
         <el-switch
-          v-model="topic.isRequired"
+          v-model="listData.qisrequire"
           active-text="有"
           inactive-text="否"
         />
@@ -106,28 +63,81 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Questionnaire } from "../../types/Naire";
 
 @Component
 export default class extends Vue {
-  @Prop({ required: true }) private topic!: Questionnaire.IQuestionItem
-  @Prop({ required: true }) private index!: number
+  // @Prop() private topic: any;
 
-  private delOption (index: number, opIndex: number) {
-    this.$emit('delOption', {
-      index,
-      opIndex
-    })
+  @Prop({ required: true }) private isSubmit!: boolean;
+
+  private rules = {
+    qcontent: [
+      {
+        required: true,
+        message: "选项内容不能为空",
+        trigger: "blur"
+      }
+    ]
+  };
+  private listData: any = {
+    question: "单选题目",
+    qcontent: "题目标题",
+    optionsList: [
+      {
+        ovalue: "选项",
+        odesc: "描述",
+        content: "选项",
+        isAddition: false,
+        image: "",
+        desc: ""
+      }
+    ],
+    qisrequire: true,
+    qdescription: "",
+    qtype: "单选",
+    isRequired: true,
+    selectContent: "",
+    setting: {
+      last: 1
+    },
+    additional: ""
+  };
+
+  private delOption(index: number, opIndex: number) {
+    // this.$emit("delOption", {
+    //   index,
+    //   opIndex
+    // });
+    if (this.listData.optionsList!.length < 2) {
+      return this.$message.warning("已经是最后一个选项，无法删除。");
+    }
+    this.listData.optionsList!.splice(opIndex, 1);
   }
 
-  private addOption (index: number) {
-    this.$emit('addOption', {
-      index
-    })
+  addOption(index: number) {
+    // this.$emit("addOption", {
+    //   index
+    // });
+
+    this.listData.optionsList!.push({
+      ovalue: "选项",
+      odesc: "描述",
+      content: "选项",
+      isAddition: false,
+      image: "",
+      desc: ""
+    });
+    console.log(this.listData);
+  }
+
+  @Watch("listData")
+  mounted() {
+    console.log(1);
+    
   }
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

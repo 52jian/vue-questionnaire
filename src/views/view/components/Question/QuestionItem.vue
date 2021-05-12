@@ -24,6 +24,10 @@ export default class extends Vue {
     if (this.type === questionType.MULTIPLE_CHOICE) { return 'MultiChoice' }
     if (this.type === questionType.TEXT_QUESTION) { return 'TextQuestion' }
   }
+
+  mounted(){
+    
+  }
 }
 </script>
 

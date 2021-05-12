@@ -2,19 +2,19 @@
   <div>
     <el-form-item
       label="题目"
-      :prop="'topic.' + index + '.question'"
+      :prop="'listData.' + index + '.qcontent'"
       :rules="{
         required: true, message: '题目内容不能为空', trigger: 'blur'
       }"
     >
-      <el-input v-model="topic.question" placeholder="请输入题目内容" />
+      <el-input v-model="listData.qcontent" placeholder="请输入题目内容" />
     </el-form-item>
     <el-form-item label="题目说明">
-      <el-input v-model="topic.description" placeholder="请输入题目说明，可以为空" />
+      <el-input v-model="listData.qdescription" placeholder="请输入题目说明，可以为空" />
     </el-form-item>
     <el-form-item label="">
       <div
-        v-for="(option, opIndex) in topic.options"
+        v-for="(option, opIndex) in listData.optionsList"
         :key="opIndex"
         class="option-item"
       >
@@ -22,13 +22,13 @@
           <el-col :span="18">
             <el-form-item
               :label="`选项 ${ opIndex + 1 }`"
-              :prop="'topic.' + index + '.options.' + opIndex + '.content'"
+              :prop="'listData.' + index + '.optionsList.' + opIndex + '.qcontent'"
               :rules="{
                 required: true, message: '选项内容不能为空', trigger: 'blur'
               }"
             >
               <el-input
-                v-model="option.content"
+                v-model="option.qcontent"
                 placeholder="请输入选项内容"
               />
             </el-form-item>
@@ -52,7 +52,7 @@
           <el-col :span="18">
             <el-form-item label="描述">
               <el-input
-                v-model="option.desc"
+                v-model="option.qdesc"
                 type="textarea"
                 :autosize="{ minRows: 2,maxRows: 5 }"
                 placeholder="请输入选项描述"
@@ -60,7 +60,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <!-- <el-row>
           <el-col :span="18">
             <el-form-item label="图片">
               <el-input
@@ -85,44 +85,70 @@
               disabled
             />
           </el-form-item>
-        </div>
+        </div> -->
       </div>
     </el-form-item>
     <el-form-item
       label="必填项"
-      :prop="'topic.' + index + '.isRequired'"
+      :prop="'listData.' + index + '.isRequired'"
       :rules="{
         type: 'boolean', required: true, message: '请选择是否为必填项', trigger: 'change'
       }"
     >
       <div class="option-addtion">
         <el-switch
-          v-model="topic.isRequired"
+          v-model="listData.isRequired"
           active-text="有"
           inactive-text="否"
         />
       </div>
     </el-form-item>
     <el-form-item
-      v-if="topic.setting"
+      v-if="listData.setting"
       label="最少勾几项"
-      :prop="'topic.' + index + '.setting.last'"
+      :prop="'listData.' + index + '.setting.last'"
       :rules="{
         required: true, message: '请输入至少勾选几项', trigger: 'blur'
       }"
     >
-      <el-input v-model="topic.setting.last" placeholder="请输入至少勾选几项，默认请填写1" />
+      <el-input v-model="listData.setting.last" placeholder="请输入至少勾选几项，默认请填写1" />
     </el-form-item>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 
 @Component
 export default class extends Vue {
   @Prop({ required: true }) private topic!: Questionnaire.IQuestionItem
   @Prop({ required: true }) private index!: number
+
+  private listData: any = {
+    question: "多选题目",
+    qcontent: "多选标题",
+    optionsList: [
+      {
+        ovalue: "多选选项",
+        odesc: "多选描述",
+        content: "多选选项",
+        isAddition: false,
+        image: "",
+        desc: ""
+      }
+    ],
+    qisrequire: true,
+    qdescription: "",
+    qtype: "多选",
+    isRequired: true,
+    selectContent: "",
+    setting: {
+      last: 1
+    },
+    additional: ""
+  };
+
+  @Watch("listData")
 
   private delOption (index: number, opIndex: number) {
     this.$emit('delOption', {
@@ -132,9 +158,17 @@ export default class extends Vue {
   }
 
   private addOption (index: number) {
-    this.$emit('addOption', {
-      index
-    })
+    // this.$emit('addOption', {
+    //   index
+    // })
+    this.listData.optionsList!.push({
+      ovalue: "选项",
+      odesc: "描述",
+      content: "选项",
+      isAddition: false,
+      image: "",
+      desc: ""
+    });
   }
 }
 </script>

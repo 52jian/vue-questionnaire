@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import SingleChoice from './SingleChoice.vue'
-import MultiChoice from './MultiChoice.vue'
-import TextQuestion from './TextQuestion.vue'
-import { questionType } from '@/config/enum/questionType'
+import { Component, Vue, Prop } from "vue-property-decorator";
+import SingleChoice from "./SingleChoice.vue";
+import MultiChoice from "./MultiChoice.vue";
+import TextQuestion from "./TextQuestion.vue";
+import { questionType } from "../../config/enum/questionType";
 
 @Component({
   components: {
@@ -17,18 +17,27 @@ import { questionType } from '@/config/enum/questionType'
   }
 })
 export default class extends Vue {
-  @Prop() type!: string
+  @Prop({ default: "单选" }) type!: string;
 
-  get componentName () {
-    if (this.type === questionType.SINGLE_CHOICE) { return 'SingleChoice' }
-    if (this.type === questionType.MULTIPLE_CHOICE) { return 'MultiChoice' }
-    if (this.type === questionType.TEXT_QUESTION) { return 'TextQuestion' }
+  get componentName() {
+    if (this.type === questionType.SINGLE_CHOICE) {
+      return "SingleChoice";
+    }
+    if (this.type === questionType.MULTIPLE_CHOICE) {
+      return "MultiChoice";
+    }
+    if (this.type === questionType.TEXT_QUESTION) {
+      return "TextQuestion";
+    }
+  }
+
+  updated() {
+    
   }
 }
 </script>
 
 <style lang="scss">
-  .option-item {
-
-  }
+.option-item {
+}
 </style>

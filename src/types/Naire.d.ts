@@ -1,11 +1,17 @@
 declare namespace Questionnaire {
   export interface INaire {
-    title: string,
-    intro: string,
-    deadline: number | string
-    status: number,
-    options: any,
-    topic: IQuestionItem[]
+    ntitle: string,
+    ntype: string,
+    nintro: string,
+    ndeadline: number | string
+    nstatus: boolean,
+    question: IQuestionItem,
+    ncreattime: string,
+    aid?: string,
+    nid?: string,
+    noptions?:string,
+    nupdatetime?: string
+    topic: IQuestionItem
   }
 
   export interface IQuestionSetting {
@@ -15,23 +21,28 @@ declare namespace Questionnaire {
   export type QuestionType = '单选' | '多选' | '文本'
 
   export interface IQuestionItem {
-    q_id?: string,
-    description: string,
-    isRequired: boolean,
-    options?: IOptionItem[],
+    nid?: string,
+    qdescription: string,
+    qisrequire: boolean,
+    optionsList: IOptionItem[],
     question: string,
     setting: IQuestionSetting,
-    additional?: string,
+    qaddtion?: string,
     selectContent?: string,
     selectMultipleContent?: number[],
-    type: string
+    qtype: string
 }
 
   export interface IOptionItem {
-    o_id?: string,
-    content: string,
-    desc: string,
-    image: string,
-    isAddition: boolean
+    nid: string,
+    qid: string,
+    oid: string,
+    ovalue: string,
+    odesc: string,
+    oimage: string,
+    oisaddtion: boolean,
+    oupdatetime: string,
+    ocreatetime: string,
+
   }
 }

@@ -1,13 +1,15 @@
 const path = require('path')
-function resolve (dir) {
+
+function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
 module.exports = {
+  lintOnSave: false,
   devServer: {
     port: 9191,
-    proxy:{
-      '/api':{
+    proxy: {
+      '/api': {
         target: 'http://47.119.152.95:8888',
         changeOrigin: true,
         pathRewrite: {

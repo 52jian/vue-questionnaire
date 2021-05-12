@@ -6,18 +6,16 @@ export interface IToken {
 }
 
 export function login (data: {
-  username: string,
+  userName: string,
   password: string
 }) {
-  const params = qs.stringify({
-    ...data
-  })
-  return request.post<IToken>('/admin/login', params)
+  return request.post<IToken>(`/admin/login?userName=${data.userName}&password=${data.password}`)
 }
 
 export function changePwd (data: {
-  oldpwd: string
-  newpwd: string
+  newPassword : string
+  oldPassword : string
+  userName :string
 }) {
-  return request.post<any>('/admin/changepwd', data)
+  return request.get<any>(`/admin/modify?newPassword=${data.newPassword}&oldPassword=${data.oldPassword}&userName=${data.userName}`)
 }

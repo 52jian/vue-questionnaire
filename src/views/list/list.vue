@@ -2,18 +2,21 @@
   <div v-loading.fullscreen.lock="loading" class="naire-list">
     <div class="naire-btn">
       <el-button type="primary" @click="createNaire">创建问卷</el-button>
-      <el-button type="danger" @click="batchDelete">批量删除</el-button>
+      <!-- <el-button type="danger" @click="batchDelete">批量删除</el-button> -->
     </div>
     <el-table :data="list" @selection-change="onSelectionChange">
-      <el-table-column
-        type="selection"
-        width="55"
-      />
+      <!-- <el-table-column type="selection" width="55" /> -->
       <el-table-column prop="ntitle" label="调查名称" align="left">
         <template slot-scope="{ row }">
           <router-link tag="a" :to="`./view/${row.nid}`">
             {{ row.ntitle }}
-            <el-tag v-if="isExpired(row.ndeadline)" class="ml-10" size="mini" type="danger">已截止</el-tag>
+            <el-tag
+              v-if="isExpired(row.ndeadline)"
+              class="ml-10"
+              size="mini"
+              type="danger"
+              >已截止</el-tag
+            >
           </router-link>
         </template>
       </el-table-column>
@@ -42,18 +45,28 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="200px">
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" style="margin-right: 10px" @click="handleStatistics(row)">统计分析</el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            style="margin-right: 10px"
+            @click="handleStatistics(row)"
+            >统计分析</el-button
+          >
           <el-dropdown trigger="click" @command="onOptionClick($event, row)">
             <el-button type="danger" size="mini">
               操作<i class="el-icon-arrow-down el-icon--right" />
             </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="preview">预览问卷</el-dropdown-item>
-              <el-dropdown-item command="copyUrl">复制地址</el-dropdown-item>
-              <el-dropdown-item command="submitStatistic">查看回收情况</el-dropdown-item>
-              <el-dropdown-item command="edit" divided>编辑问卷</el-dropdown-item>
-              <el-dropdown-item command="deadline">编辑截止时间</el-dropdown-item>
-              <el-dropdown-item command="publish">{{ row.nstatus === NaireStatus.PUBLISHED ? '停止发布' : '发布问卷' }}</el-dropdown-item>
+              <!-- <el-dropdown-item command="copyUrl">复制地址</el-dropdown-item> -->
+              <!-- <el-dropdown-item command="submitStatistic">查看回收情况</el-dropdown-item> -->
+              <el-dropdown-item command="edit" divided
+                >编辑问卷</el-dropdown-item
+              >
+              <!-- <el-dropdown-item command="deadline">编辑截止时间</el-dropdown-item> -->
+              <el-dropdown-item command="publish">{{
+                row.nstatus === true ? "停止发布" : "发布问卷"
+              }}</el-dropdown-item>
               <el-dropdown-item command="delete">删除问卷</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -135,9 +148,9 @@ export default class NavBar extends Vue {
         break
       case 'edit':
         this.$router.push({
-          name: 'edit',
+          name: 'create',
           params: {
-            id: row.n_id
+            id: row.nid
           }
         })
         break
@@ -168,14 +181,10 @@ export default class NavBar extends Vue {
 
   private async deleteNaire (nIds: string) {
     const res = await NaireAction.del({
-      n_id: nIds
+      nId: nIds
     })
-    if (res.success) {
-      this.$message.success('删除成功')
+      this.$message.success(res.msg)
       this.fetchListData()
-    } else {
-      this.$message.error('删除失败')
-    }
   }
 
   public singleDelete (row: IApiNaireItem) {
@@ -183,7 +192,9 @@ export default class NavBar extends Vue {
       type: 'warning'
     })
       .then(async () => {
-        this.deleteNaire(row.n_id)
+        console.log(row);
+        
+        this.deleteNaire(row.nid)
       })
       .catch(() => {})
   }
@@ -217,17 +228,11 @@ export default class NavBar extends Vue {
    * @param row
    */
   async changeStatus (row: IApiNaireItem) {
-    this.loading = true
     const res = await NaireAction.changeStatus({
-      n_id: row.n_id
+      nId: row.nid
     })
-    this.loading = false
-    if (res.success) {
-      this.$message.success('更改状态成功')
+      this.$message.success(res.msg)
       this.fetchListData()
-    } else {
-      this.$message.error(res.msg)
-    }
   }
 
   public async fetchListData () {
@@ -241,13 +246,12 @@ export default class NavBar extends Vue {
     this.loading = false
     // if (!res.success) return
     this.list = res.data ? res.data : []
-    console.log(this.list)
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .naire-btn {
-    margin: 10px;
-  }
+.naire-btn {
+  margin: 10px;
+}
 </style>

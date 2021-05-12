@@ -18,9 +18,16 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // 判断是否存在token，如果存在的话，则每个http header都加上token
-    const jwtToken = getLocalStorage('JWT_TOKEN')
-    if (jwtToken) {
-      config.headers.Authorization = `token ${jwtToken}`
+    const jwtToken = getLocalStorage('JWT_TOKEN');
+    const username = getLocalStorage('USER_NAME');
+    // if (!username) {
+    //   config.headers.Authorization = `token ${jwtToken}`
+    // }
+    if (!username) {
+      router.replace({
+        path: '/login',
+        query: { redirect: router.currentRoute.fullPath }
+      })
     }
     return config
   },
@@ -58,7 +65,7 @@ service.interceptors.response.use(
 service.defaults.transformResponse = (response) => {
   try {
     const res = JSON.parse(response)
-    if (res.err === 0) {
+    if (res.code === 200) {
       return {
         success: true,
         data: res.token || res.data, // login 接口返回 token
